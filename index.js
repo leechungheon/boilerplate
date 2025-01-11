@@ -73,6 +73,7 @@ app.post('/api/users/login', async (req, res) => {
   }
 });
 
+console.log('Auth Middleware:', auth); // auth의 값을 출력
 app.get('/api/users/auth', auth, (req,res)=>{
 
     //여기까지 미들웨어를 통과해 왔다는 얘기는 Authentication이 true라는 말
@@ -89,8 +90,27 @@ app.get('/api/users/auth', auth, (req,res)=>{
 
 })
 
+app.get('/api/users/logout', auth, async (req, res) => {
+    try {
+      // 사용자 토큰을 빈 문자열로 업데이트하여 로그아웃 처리
+      const user = await User.findOneAndUpdate(
+        { _id: req.user._id }, 
+        { token: "" }, 
+        { new: true } // 업데이트된 사용자 객체를 반환받기 위해 설정
+      );
+  
+      // 성공적으로 업데이트 되면 응답을 보냄
+      return res.status(200).send({
+        success: true
+      });
+    } catch (err) {
+      // 에러가 발생하면 응답을 보냄
+      return res.json({ success: false, err });
+    }
+  });
+  
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
-console.log('Auth Middleware:', auth); // auth의 값을 출력
 
