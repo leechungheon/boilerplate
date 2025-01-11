@@ -79,6 +79,19 @@ userSchema.methods.generateToken = async function () {
       throw err; // 에러 발생 시 throw
     }
   };  
+
+  userSchema.statics.findByToken = async function (token) {
+    try {
+      const decoded = jwt.verify(token, 'secretToken');
+      const user = await this.findOne({ _id: decoded, token });
+      return user;
+    } catch (err) {
+      console.error('findByToken Error:', err); // 디버깅용 로그 추가
+      return null; // null 반환
+    }
+  };
+  
+
   
 const User = mongoose.model('User', userSchema)
 
