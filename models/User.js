@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt=require('bcrypt');
 const saltRounds=10;
+const jwt=require('jsonwebtoken');
 
 const userSchema=mongoose.Schema({
     name:{
@@ -46,12 +47,39 @@ userSchema.pre('save',function(next){
             user.password=hash
             // Store hash in your password DB.
             next()
-        });
-    });
-}
+        })
+    })
+    }else{
+        next()
+    }
     
 })
 
+// User.js
+userSchema.methods.comparePassword = async function (plainPassword) {
+    try {
+      const isMatch = await bcrypt.compare(plainPassword, this.password);
+      return isMatch; // 비밀번호가 일치하면 true, 아니면 false 반환
+    } catch (err) {
+      throw err; // 에러 발생 시 throw
+    }
+  };
+  
+// User.js
+
+userSchema.methods.generateToken = async function () {
+    const user = this;
+    const token = jwt.sign(user._id.toHexString(), 'secretToken');
+  
+    user.token = token;
+    try {
+      const updatedUser = await user.save(); // async/await 방식으로 저장
+      return updatedUser; // 저장된 유저 반환
+    } catch (err) {
+      throw err; // 에러 발생 시 throw
+    }
+  };  
+  
 const User = mongoose.model('User', userSchema)
 
 module.exports={User}
