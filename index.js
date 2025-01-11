@@ -15,7 +15,7 @@ mongoose.connect('mongodb+srv://chungheon:1234@boilerplate.tcisn.mongodb.net/?re
     .catch(err=>console.log(err))
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Hello World! i am chungheon');
 });
 
 app.post('/register', (req,res)=>{
